@@ -97,7 +97,17 @@ class ClearPrivateDataTests: KIFTestCase, UITextFieldDelegate {
         let url1 = urls[0].url
         let url2 = urls[1].url
 
-        EarlGrey.select(elementWithMatcher: grey_accessibilityLabel("History")).perform(grey_tap())
+        let historyBtnShown = GREYCondition(name: "History Button enabled") {
+            var errorOrNil: NSError?
+            EarlGrey.select(elementWithMatcher: grey_accessibilityID("HomePanels.History"))
+                .assert(grey_enabled(), error: &errorOrNil)
+            let success = errorOrNil == nil
+            return success
+        }
+        let buttonDisplayed = historyBtnShown?.wait(withTimeout: 10)
+        GREYAssertTrue(buttonDisplayed!, reason: "History tab button not enabled")
+        EarlGrey.select(elementWithMatcher: grey_accessibilityID("HomePanels.History")).perform(grey_tap())
+
         let url1Shown = GREYCondition(name: "Wait for URL 1") {
             var errorOrNil: NSError?
             EarlGrey.select(elementWithMatcher: grey_accessibilityLabel(url1))
@@ -105,7 +115,7 @@ class ClearPrivateDataTests: KIFTestCase, UITextFieldDelegate {
             let success = errorOrNil == nil
             return success
         }
-        let URL1success = url1Shown?.wait(withTimeout: 10)
+        let URL1success = url1Shown?.wait(withTimeout: 20)
         GREYAssertTrue(URL1success!, reason: "URL 1 Not Shown")
 
         let url2Shown = GREYCondition(name: "Wait for URL 2") {
